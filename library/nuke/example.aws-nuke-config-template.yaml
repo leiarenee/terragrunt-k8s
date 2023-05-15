@@ -1,0 +1,49 @@
+---
+regions:
+  - "global" # This is for all global resource types e.g. IAM
+  - "eu-west-1"
+
+account-blocklist:
+  - 999999999999
+
+accounts:
+  000000000000:
+    filters:
+      EC2VPC:
+        - property: IsDefault
+          value: "true"
+      EC2Subnet:
+        - property: DefaultForAz
+          value: "true"
+      EC2InternetGateway:
+        - property: DefaultForAz
+          value: "true"
+      EC2RouteTable:
+        - property: DefaultVPC
+          value: "true"
+      EC2DHCPOption:
+        - property: DefaultVPC
+          value: "true"
+      IAMUser:
+        - "admin"
+        - "terraform"
+      IAMUserPolicyAttachment:
+        - "admin -> AdministratorAccess"
+        - "terraform -> AdministratorAccess"
+      IAMRole:
+        - "OrganizationAccountAccessRole"
+      IAMLoginProfile:
+        - "admin"
+        - "terraform"
+      IAMRolePolicyAttachment:
+        - "OrganizationAccountAccessRole -> AdministratorAccess"
+      Route53HostedZone:
+        - property: Name
+          type: "glob"
+          value: "*.my-domain.com."
+
+resource-types:
+  # don't nuke IAM users
+  excludes:
+    - IAMUser
+    - IAMUserAccessKey

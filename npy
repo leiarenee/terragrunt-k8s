@@ -1,0 +1,132 @@
+#!/bin/bash
+# This script is designed to install, run and test a python module
+#
+
+# Stop on error
+set -e
+
+export AWS_PAGER=""
+
+# Declare default variables
+env_files=(".env" ".dev.env")
+
+# Function for showing usage
+function show_usage(){
+  cat << EOF
+  Script for easy running and testing '$NPY_PYTHON_MODULE' module
+    Usage :
+    Main commands:
+    Run Only once
+    - Install Virtual environment     $0 install
+    
+    
+    - Run All Tests:                  $0 test
+
+    - Linting                         $0 lint
+    - Build Docker                    $0 docker build
+    - Push to Docker Registry         $0 docker build push
+    - Run Docker                      $0 docker build run
+
+    - Show Usage:                     $0 help or --help or -h 
+  
+  To activate virtual environment for command line shell: (Not required for running '$0')
+  - for 'bash, sh, ksh, csh, zsh...'
+    'source $NPY_VENV_DIR/bin/activate'
+  - for 'fish'
+    'source $NPY_VENV_DIR/bin/activate.fish'
+  
+  To deactivate virtual environment:
+    'deactivate'
+EOF
+  exit 0
+}
+
+# Function for preparing environment
+function activate_virtual_env(){
+  # Activate virtual environment
+  if [ ! -d $NPY_VENV_DIR ]
+  then
+    echo "Virtual environment is not installed. Run '$0 install' command first."
+    exit 0
+  else
+    echo Activating Virtual Environment
+    echo $NPY_VENV_DIR
+    source $NPY_VENV_DIR/bin/activate
+  fi
+}
+
+
+# Function for running unit tests
+function run_tests(){
+  echo
+  echo "Running tests..."
+  $NPY_PYTHON_COMMAND -m pytest --cov=./ --cov-report=term --cov-report=html --cov-branch test/ -v
+}
+
+# Function for calling python script with arguments
+function run_application(){
+  echo
+  echo "Running $NPY_PYTHON_MODULE module "
+  echo
+  $NPY_PYTHON_COMMAND -m $NPY_PYTHON_MODULE $@
+}
+
+function install(){
+  echo "Install Python $NPY_PYTHON_VERSION"
+  brew install python@$NPY_PYTHON_VERSION
+  echo
+  echo "Installing virtualenv"
+  pip3 install virtualenv
+  echo
+  echo "Installing virtual environment binaries into $NPY_VENV_DIR with Python version $NPY_PYTHON_COMMAND"
+  virtualenv -p $NPY_PYTHON_COMMAND $NPY_VENV_DIR
+  echo "Activating virtual environment"
+  source "$NPY_VENV_DIR/bin/activate"
+  echo "Installing required packages"
+  $NPY_PYTHON_COMMAND -m pip install -r requirements.txt
+  
+}
+
+function lint(){
+  $NPY_PYTHON_COMMAND -m pylint --disable=R src
+}
+
+function environment(){
+  echo "Environment Variables"
+  env | sort
+
+}
+
+# ------------------ Main Routine -------------------------
+
+source library/scripts/import-env-vars.sh
+
+if [ "$1" != "install"  ] && [ "$1" != "help" ] && [ "$1" != "docker" ]
+then
+  activate_virtual_env
+fi
+
+# Evaluate arguments and call sub functions
+case $1 in
+  "--help"|"-h"|"help")
+  show_usage;;
+  "runner")
+  ./runner $@;;
+  "install")
+  install;;
+  "test")
+  run_tests;;
+  "docker")
+  shift 2;infra/pipeline/docker/build $@;;
+  "lint")
+  lint;;
+  "env")
+  environment;;
+  *)
+  echo "Wrong Argument";show_usage;;
+esac
+
+
+
+
+

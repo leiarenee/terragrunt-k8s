@@ -1,0 +1,57 @@
+# Terraform
+.terraform
+*.tfstate
+*.tfstate.backup
+.plugin-cache
+.terraform.lock.hcl
+
+# Terragrunt
+.terragrunt-cache
+
+# OS X
+.history
+.DS_Store
+
+# IntelliJ
+.idea_modules
+*.iml
+*.iws
+*.ipr
+.idea/
+out/
+
+#ssh
+sshkey
+
+#other
+*.override.hcl
+*.tgpid
+user/custom
+*.job
+
+.vscode
+*.code*
+venv
+temp-job
+__pycache__
+.pytest_cache
+archive
+.dev.env
+*.log
+results.txt
+*.tar
+*.tar.gz
+temp
+*.zip
+custom-test-inputs.json
+test-client-inputs.json
+log.txt
+job-resources.json
+temp-volume
+aggragated-sf-inputs.json
+sf-local.env
+.DS_Store
+github.env
+comment_body.txt
+config.hcl
+terragrunt-debug.tfvars.json
